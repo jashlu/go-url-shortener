@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis"
+	"github.com/redis/go-redis/v9"
 )
 
 // Define the struct wrapper around raw Redis client
@@ -41,7 +41,7 @@ func InitializeStore() *StorageService {
 
 	pong, err := redisClient.Ping(ctx).Result()
 	if err != nil {
-		panic(fmt.Sprintf("error init Redis: %v", err))
+		panic(fmt.Sprintf("Error init Redis: %v", err))
 	}
 
 	fmt.Printf("\nReddis started successfully: pong message = {%s}", pong)
