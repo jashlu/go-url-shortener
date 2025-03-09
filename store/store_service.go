@@ -48,3 +48,30 @@ func InitializeStore() *StorageService {
 	storeService.redisClient = redisClient
 	return storeService
 }
+
+// we want to be able to save the mapping between the original Url and the generated shortUrl url
+func SaveUrlMapping(shortUrl string, originalUrl string, userId string) {
+	//we are using Go Redi library's built-in Set function
+	// Stores a key/value pair in Redis
+	// cacheDuration is for the expiration field, the duration after which the key will expire
+	err := storeService.redisClient.Set(ctx, shortUrl, originalUrl, CacheDuration).Err()
+	if err != nil {
+		panic(fmt.Sprintf("Failed saving key url | Error: %v - shortUrl: %s - originalUrl: %s\n", err, shortUrl, originalUrl))
+	}
+
+}
+
+// we should be able to retrieve the initial long URL once the short is provided
+// this is when users will be calling the shortlink in the url so we need to retrieve
+// the long url and redirect
+
+func RetrieveInitialUrl(shortUrl string) string {
+	// built in Get function
+	// it returns a *StrignCmd object, which is a command wrapper that holds the Redis response
+	// we use Result() in order to return the actual value and any possible error
+	originalUrl, err := storeService.redisClient.Get(ctx, shortUrl).Result()
+	if err != nil {
+		panic(fmt.Sprintf("Failed RetrieveInitialUrl | Error: %v - shortUrl: %s\n", err, shortUrl))
+	}
+	return originalUrl
+}
